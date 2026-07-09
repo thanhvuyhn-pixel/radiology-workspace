@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Radiology Workspace - Portal nội bộ Viện Điện Quang, Bệnh viện Bạch Mai."
+    />
+    <title>Radiology Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="workspace-shell">
+      <aside class="sidebar" aria-label="Điều hướng chính">
+        <a class="brand" href="#" aria-label="Radiology Workspace Home">
+          <span class="brand-mark">RW</span>
+          <span>
+            <strong>Radiology Workspace</strong>
+            <small>Version 1.0.0</small>
+          </span>
+        </a>
+
+        <nav class="navigation" id="navigation"></nav>
+
+        <section class="owner-panel" aria-label="Thông tin đơn vị">
+          <span>Owner</span>
+          <strong>BS Thanh Vũ</strong>
+          <small>Viện Điện Quang<br />Bệnh viện Bạch Mai</small>
+        </section>
+      </aside>
+
+      <div class="content-shell">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Xin chào BS Thanh Vũ</p>
+            <h1>Radiology Workspace</h1>
+            <p class="subtitle">Điều hành • Chuyên môn • Nghiên cứu</p>
+          </div>
+
+          <div class="time-card" aria-label="Thời gian hiện tại">
+            <span id="current-date">--</span>
+            <strong id="current-time">--:--:--</strong>
+          </div>
+        </header>
+
+        <main>
+          <section class="toolbar" aria-label="Bộ lọc ứng dụng">
+            <div>
+              <span class="section-kicker">Portal</span>
+              <h2>Ứng dụng nội bộ</h2>
+            </div>
+            <div class="status-pill" id="app-count">0 ứng dụng</div>
+          </section>
+
+          <section class="app-grid" id="app-grid" aria-live="polite"></section>
+        </main>
+
+        <footer class="footer">
+          <strong>Radiology Workspace</strong>
+          <span>Version 1.0.0</span>
+          <span>© 2026 BS Thanh Vũ</span>
+        </footer>
+      </div>
+    </div>
+
+    <script src="script.js" type="module"></script>
+  </body>
+</html>

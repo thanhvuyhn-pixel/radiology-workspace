@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "owner": "BS Thanh Vũ",
+  "apps": [
+    {
+      "id": "phan-ca",
+      "name": "Phân ca",
+      "description": "Quản lý lịch phân ca trực và điều phối nhân sự trong viện.",
+      "url": "https://phan-ca-vien-dien-quang.netlify.app/",
+      "icon": "📅",
+      "category": "Điều hành",
+      "color": "blue",
+      "badge": "Operations"
+    },
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "description": "Theo dõi chỉ số vận hành, báo cáo nhanh và dữ liệu tổng quan.",
+      "url": "https://dashboard-vien-dien-quang.netlify.app/",
+      "icon": "📊",
+      "category": "Điều hành",
+      "color": "green",
+      "badge": "Analytics"
+    },
+    {
+      "id": "cham-cong",
+      "name": "Chấm công",
+      "description": "Ghi nhận thời gian làm việc, trực, nghỉ và dữ liệu hiện diện.",
+      "url": "https://cham-cong-vien-dien-quang.netlify.app/",
+      "icon": "⏰",
+      "category": "Điều hành",
+      "color": "orange",
+      "badge": "HR"
+    },
+    {
+      "id": "giao-ban",
+      "name": "Giao ban",
+      "description": "Tổ chức nội dung giao ban, ghi chú ca bệnh và thông tin cần xử lý.",
+      "url": "https://giaoban-vien-dien-quang.netlify.app/",
+      "icon": "👥",
+      "category": "Điều hành",
+      "color": "red",
+      "badge": "Meeting"
+    }
+  ]
+}
