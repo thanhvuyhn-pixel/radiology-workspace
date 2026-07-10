@@ -72,9 +72,9 @@
           <main class="main-workspace">
             <section class="hero-card" aria-label="Lời chào theo thời gian">
               <div>
-                <p class="hero-kicker">Workspace Portal</p>
+                <p class="hero-kicker">Application Launcher</p>
                 <h2 id="hero-greeting">Chào buổi sáng BS Thanh Vũ</h2>
-                <p>Hôm nay bạn muốn làm gì?</p>
+                <p>Mở nhanh các ứng dụng nội bộ như Launchpad của Radiology Workspace.</p>
               </div>
               <div class="hero-orbit" aria-hidden="true">
                 <span></span>
@@ -85,6 +85,42 @@
 
             <section class="quick-actions" aria-label="Quick Actions">
               <div class="quick-action-grid" id="quick-actions"></div>
+            </section>
+
+            <section class="launcher-search-panel" aria-label="Tìm kiếm ứng dụng">
+              <div class="launcher-search">
+                <i data-lucide="search" aria-hidden="true"></i>
+                <input
+                  id="launcher-search"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Tìm ứng dụng theo tên hoặc danh mục..."
+                  aria-label="Tìm ứng dụng theo tên hoặc danh mục"
+                />
+              </div>
+              <button class="clear-search" id="clear-search" type="button">Clear</button>
+            </section>
+
+            <section class="favorites-section" aria-label="Ứng dụng yêu thích">
+              <div class="toolbar compact-toolbar">
+                <div>
+                  <span class="section-kicker">Pinned Apps</span>
+                  <h2>Favorites</h2>
+                </div>
+                <div class="status-pill" id="favorite-count">0 pinned</div>
+              </div>
+              <div class="favorite-grid" id="favorite-grid"></div>
+            </section>
+
+            <section class="recently-used-section" aria-label="Ứng dụng dùng gần đây">
+              <div class="toolbar compact-toolbar">
+                <div>
+                  <span class="section-kicker">Activity</span>
+                  <h2>Recently Used</h2>
+                </div>
+                <div class="status-pill" id="recent-count">0 recent</div>
+              </div>
+              <div class="recent-grid" id="recent-grid"></div>
             </section>
 
             <section class="toolbar" aria-label="Danh sách ứng dụng">
@@ -186,6 +222,6 @@
     </div>
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="script.js" type="module"></script>
+    <script src="script.js?v=3a-launcher" type="module"></script>
   </body>
 </html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Radiology Workspace</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --text: #0f172a;
+        --muted: #64748b;
+        --panel: rgba(255, 255, 255, 0.78);
+        --line: rgba(15, 23, 42, 0.08);
+        --primary: #2563eb;
+        --success: #10b981;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent), #f8fafc;
+      }
+
+      .app-shell {
+        display: grid;
+        gap: 22px;
+        padding: 28px;
+      }
+
+      .app-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .breadcrumb {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 5vw, 4rem);
+        line-height: 0.98;
+      }
+
+      p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .status {
+        min-width: 150px;
+        padding: 13px 15px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        font-weight: 850;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card,
+      .wide-card {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
+      }
+
+      .card {
+        min-height: 150px;
+        padding: 22px;
+      }
+
+      .card span {
+        color: var(--muted);
+        font-weight: 760;
+      }
+
+      .card strong {
+        display: block;
+        margin-top: 18px;
+        font-size: 2.4rem;
+      }
+
+      .wide-card {
+        display: grid;
+        gap: 12px;
+        min-height: 260px;
+        padding: 24px;
+      }
+
+      .bar {
+        height: 18px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--primary), var(--success));
+      }
+
+      .bar:nth-child(2) {
+        width: 78%;
+      }
+
+      .bar:nth-child(3) {
+        width: 62%;
+      }
+
+      .bar:nth-child(4) {
+        width: 88%;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #ffffff;
+          --muted: rgba(255, 255, 255, 0.78);
+          --panel: rgba(15, 23, 42, 0.82);
+          --line: rgba(255, 255, 255, 0.14);
+        }
+
+        body {
+          background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), transparent), #08111f;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .app-shell {
+          padding: 20px;
+        }
+
+        .app-header,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .app-header {
+          display: grid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <div class="breadcrumb">Radiology Workspace / Điều hành / Dashboard</div>
+          <h1>Dashboard</h1>
+          <p>Theo dõi vận hành, chỉ số tổng quan và các điểm cần chú ý trong ngày.</p>
+        </div>
+        <div class="status">Live overview</div>
+      </header>
+
+      <section class="grid" aria-label="Dashboard metrics">
+        <article class="card"><span>Ca trực</span><strong>24</strong></article>
+        <article class="card"><span>Báo cáo</span><strong>128</strong></article>
+        <article class="card"><span>Ưu tiên</span><strong>07</strong></article>
+      </section>
+
+      <section class="wide-card" aria-label="Operational trend">
+        <strong>Operational Trend</strong>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </section>
+    </main>
+  </body>
+</html>

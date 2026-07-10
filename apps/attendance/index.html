@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chấm công - Radiology Workspace</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --text: #0f172a;
+        --muted: #64748b;
+        --panel: rgba(255, 255, 255, 0.78);
+        --line: rgba(15, 23, 42, 0.08);
+        --warning: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent), #f8fafc;
+      }
+
+      .app-shell {
+        display: grid;
+        gap: 22px;
+        padding: 28px;
+      }
+
+      .breadcrumb {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 5vw, 4rem);
+      }
+
+      p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        min-height: 220px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
+      }
+
+      .clock {
+        color: var(--warning);
+        font-size: 3.6rem;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .list span {
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(245, 158, 11, 0.1);
+        font-weight: 760;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #ffffff;
+          --muted: rgba(255, 255, 255, 0.78);
+          --panel: rgba(15, 23, 42, 0.82);
+          --line: rgba(255, 255, 255, 0.14);
+        }
+
+        body {
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), transparent), #08111f;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .app-shell {
+          padding: 20px;
+        }
+
+        .panel {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <div class="breadcrumb">Radiology Workspace / Điều hành / Chấm công</div>
+        <h1>Chấm công</h1>
+        <p>Không gian mẫu cho ghi nhận hiện diện, ca trực và các mốc thời gian chính.</p>
+      </header>
+
+      <section class="panel" aria-label="Chấm công mẫu">
+        <article class="card">
+          <span>Current session</span>
+          <div class="clock">08:00</div>
+          <p>Bắt đầu ca làm việc tiêu chuẩn.</p>
+        </article>
+        <article class="card">
+          <span>Activity</span>
+          <div class="list">
+            <span>Check-in: 07:48</span>
+            <span>Break: 12:00</span>
+            <span>Expected check-out: 17:00</span>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

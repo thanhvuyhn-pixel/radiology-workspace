@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giao ban - Radiology Workspace</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --text: #0f172a;
+        --muted: #64748b;
+        --panel: rgba(255, 255, 255, 0.78);
+        --line: rgba(15, 23, 42, 0.08);
+        --danger: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), transparent), #f8fafc;
+      }
+
+      .app-shell {
+        display: grid;
+        gap: 22px;
+        padding: 28px;
+      }
+
+      .breadcrumb {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 5vw, 4rem);
+      }
+
+      p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .column {
+        min-height: 340px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
+      }
+
+      .column h2 {
+        margin: 0 0 14px;
+        font-size: 1rem;
+      }
+
+      .note {
+        margin-top: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(239, 68, 68, 0.09);
+        color: var(--text);
+        line-height: 1.55;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #ffffff;
+          --muted: rgba(255, 255, 255, 0.78);
+          --panel: rgba(15, 23, 42, 0.82);
+          --line: rgba(255, 255, 255, 0.14);
+        }
+
+        body {
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), transparent), #08111f;
+        }
+      }
+
+      @media (max-width: 820px) {
+        .app-shell {
+          padding: 20px;
+        }
+
+        .board {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <div class="breadcrumb">Radiology Workspace / Điều hành / Giao ban</div>
+        <h1>Giao ban</h1>
+        <p>Không gian mẫu cho chuẩn bị giao ban, ghi chú ca bệnh và các việc cần theo dõi.</p>
+      </header>
+
+      <section class="board" aria-label="Bảng giao ban mẫu">
+        <article class="column">
+          <h2>Chuẩn bị</h2>
+          <div class="note">Danh sách ca bệnh cần trình bày.</div>
+          <div class="note">Tổng hợp ca cấp cứu trong đêm.</div>
+        </article>
+        <article class="column">
+          <h2>Đang xử lý</h2>
+          <div class="note">Theo dõi kết quả can thiệp.</div>
+          <div class="note">Rà soát báo cáo cần ký.</div>
+        </article>
+        <article class="column">
+          <h2>Hoàn tất</h2>
+          <div class="note">Cập nhật lịch trực tuần.</div>
+          <div class="note">Đóng biên bản giao ban.</div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

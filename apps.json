@@ -5,42 +5,66 @@
     {
       "id": "phan-ca",
       "name": "Phân ca",
+      "icon": "calendar-days",
+      "category": "Điều hành",
       "description": "Quản lý lịch phân ca trực và điều phối nhân sự trong viện.",
       "url": "https://phan-ca-vien-dien-quang.netlify.app/",
-      "icon": "📅",
-      "category": "Điều hành",
+      "version": "1.0.0",
+      "status": "online",
+      "owner": "BS Thanh Vũ",
+      "favorite": true,
       "color": "blue",
-      "badge": "Operations"
+      "badge": "Operations",
+      "launchMode": "external",
+      "workspacePath": "apps/schedule/index.html"
     },
     {
       "id": "dashboard",
       "name": "Dashboard",
+      "icon": "bar-chart-3",
+      "category": "Điều hành",
       "description": "Theo dõi chỉ số vận hành, báo cáo nhanh và dữ liệu tổng quan.",
       "url": "https://dashboard-vien-dien-quang.netlify.app/",
-      "icon": "📊",
-      "category": "Điều hành",
+      "version": "1.0.0",
+      "status": "online",
+      "owner": "BS Thanh Vũ",
+      "favorite": true,
       "color": "green",
-      "badge": "Analytics"
+      "badge": "Analytics",
+      "launchMode": "external",
+      "workspacePath": "apps/dashboard/index.html"
     },
     {
       "id": "cham-cong",
       "name": "Chấm công",
+      "icon": "clock-3",
+      "category": "Điều hành",
       "description": "Ghi nhận thời gian làm việc, trực, nghỉ và dữ liệu hiện diện.",
       "url": "https://cham-cong-vien-dien-quang.netlify.app/",
-      "icon": "⏰",
-      "category": "Điều hành",
+      "version": "1.0.0",
+      "status": "beta",
+      "owner": "BS Thanh Vũ",
+      "favorite": false,
       "color": "orange",
-      "badge": "HR"
+      "badge": "HR",
+      "launchMode": "external",
+      "workspacePath": "apps/attendance/index.html"
     },
     {
       "id": "giao-ban",
       "name": "Giao ban",
+      "icon": "users-round",
+      "category": "Điều hành",
       "description": "Tổ chức nội dung giao ban, ghi chú ca bệnh và thông tin cần xử lý.",
       "url": "https://giaoban-vien-dien-quang.netlify.app/",
-      "icon": "👥",
-      "category": "Điều hành",
+      "version": "1.0.0",
+      "status": "online",
+      "owner": "BS Thanh Vũ",
+      "favorite": false,
       "color": "red",
-      "badge": "Meeting"
+      "badge": "Meeting",
+      "launchMode": "external",
+      "workspacePath": "apps/meeting/index.html"
     }
   ]
 }

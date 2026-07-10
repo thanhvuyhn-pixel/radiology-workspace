@@ -5,7 +5,8 @@ const CONFIG = {
   storageKeys: {
     theme: "radiology-workspace-theme",
     recentApps: "radiology-workspace-recent-apps",
-    sidebar: "radiology-workspace-sidebar"
+    sidebar: "radiology-workspace-sidebar",
+    favorites: "radiology-workspace-launcher-favorites"
   }
 };
 
@@ -18,13 +19,6 @@ const menuItems = [
   { id: "settings", label: "Settings", icon: "settings" }
 ];
 
-const iconMap = {
-  "phan-ca": "calendar-days",
-  dashboard: "bar-chart-3",
-  "cham-cong": "clock-3",
-  "giao-ban": "users-round"
-};
-
 const colorClassMap = {
   blue: "is-blue",
   green: "is-green",
@@ -32,15 +26,22 @@ const colorClassMap = {
   red: "is-red"
 };
 
+const statusMap = {
+  online: { label: "Online", className: "status-online", dot: "🟢" },
+  beta: { label: "Beta", className: "status-beta", dot: "🟡" },
+  offline: { label: "Offline", className: "status-offline", dot: "🔴" }
+};
+
 const state = {
   apps: [],
+  filteredApps: [],
   searchOpen: false,
-  searchIndex: 0
+  searchIndex: 0,
+  launcherQuery: ""
 };
 
 const elements = {
   shell: document.querySelector("#workspace-shell"),
-  sidebar: document.querySelector("#sidebar"),
   sidebarToggle: document.querySelector("#sidebar-toggle"),
   navigation: document.querySelector("#navigation"),
   quickLaunch: document.querySelector("#quick-launch"),
@@ -50,6 +51,12 @@ const elements = {
   continueWidget: document.querySelector("#continue-widget"),
   continueLink: document.querySelector("#continue-link"),
   continueName: document.querySelector("#continue-name"),
+  launcherSearch: document.querySelector("#launcher-search"),
+  clearSearch: document.querySelector("#clear-search"),
+  favoriteGrid: document.querySelector("#favorite-grid"),
+  favoriteCount: document.querySelector("#favorite-count"),
+  recentGrid: document.querySelector("#recent-grid"),
+  recentCount: document.querySelector("#recent-count"),
   appGrid: document.querySelector("#app-grid"),
   appCount: document.querySelector("#app-count"),
   currentDate: document.querySelector("#current-date"),
@@ -64,7 +71,7 @@ const elements = {
 };
 
 function createIcon(name, className = "") {
-  return `<i class="${className}" data-lucide="${name}" aria-hidden="true"></i>`;
+  return `<i class="${className}" data-lucide="${name || "app-window"}" aria-hidden="true"></i>`;
 }
 
 function refreshIcons() {
@@ -90,6 +97,25 @@ function writeStorage(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+function getFavoriteIds() {
+  return readStorage(CONFIG.storageKeys.favorites, null);
+}
+
+function isFavorite(app) {
+  const favoriteIds = getFavoriteIds();
+  return favoriteIds ? favoriteIds.includes(app.id) : Boolean(app.favorite);
+}
+
+function persistFavorite(appId, nextValue) {
+  const baseIds = state.apps.filter((app) => app.favorite).map((app) => app.id);
+  const favoriteIds = getFavoriteIds() || baseIds;
+  const nextIds = nextValue
+    ? [...new Set([...favoriteIds, appId])]
+    : favoriteIds.filter((id) => id !== appId);
+
+  writeStorage(CONFIG.storageKeys.favorites, nextIds);
+}
+
 function getAppById(appId) {
   return state.apps.find((app) => app.id === appId);
 }
@@ -99,22 +125,64 @@ function getRecentApps() {
   return recentIds.map(getAppById).filter(Boolean);
 }
 
+function getStatus(app) {
+  return statusMap[app.status] || statusMap.offline;
+}
+
+function getLaunchHref(app) {
+  return app.launchMode === "workspace" && app.workspacePath ? app.workspacePath : app.url;
+}
+
+function getSearchText(app) {
+  return [app.name, app.category, app.description, app.owner, app.status]
+    .join(" ")
+    .toLowerCase();
+}
+
+function getFilteredApps() {
+  const query = state.launcherQuery.trim().toLowerCase();
+
+  if (!query) {
+    return state.apps;
+  }
+
+  return state.apps.filter((app) => getSearchText(app).includes(query));
+}
+
 function recordAppOpen(appId) {
   const recentIds = readStorage(CONFIG.storageKeys.recentApps, []);
   const nextRecentIds = [appId, ...recentIds.filter((id) => id !== appId)].slice(0, 10);
   writeStorage(CONFIG.storageKeys.recentApps, nextRecentIds);
-  renderWorkspaceMemory();
-  renderRecentActivity();
-  renderQuickLaunch(state.apps);
-  refreshIcons();
+  renderLauncher();
 }
 
-function openApp(app) {
+function setLaunchLoading(appId) {
+  document.querySelectorAll(`[data-app-id="${appId}"]`).forEach((node) => {
+    node.classList.add("is-launching");
+    node.closest(".app-card")?.classList.add("is-launching");
+  });
+
+  window.setTimeout(() => {
+    document.querySelectorAll(`[data-app-id="${appId}"]`).forEach((node) => {
+      node.classList.remove("is-launching");
+      node.closest(".app-card")?.classList.remove("is-launching");
+    });
+  }, 650);
+}
+
+function launchApp(app) {
   if (!app) {
     return;
   }
 
   recordAppOpen(app.id);
+  setLaunchLoading(app.id);
+
+  if (app.launchMode === "workspace" && app.workspacePath) {
+    window.location.href = app.workspacePath;
+    return;
+  }
+
   window.open(app.url, "_blank", "noopener,noreferrer");
 }
 
@@ -122,7 +190,7 @@ function renderNavigation() {
   elements.navigation.innerHTML = menuItems
     .map(
       (item) => `
-        <a class="nav-item ${item.active ? "is-active" : ""}" href="#${item.id}" data-tooltip="${item.label}">
+        <a class="nav-item ${item.active ? "is-active" : ""}" href="#${item.id}" data-nav-id="${item.id}" data-tooltip="${item.label}">
           <span>${createIcon(item.icon)}</span>
           <span class="nav-label">${item.label}</span>
         </a>
@@ -131,39 +199,53 @@ function renderNavigation() {
     .join("");
 }
 
-function createAppCard(app) {
+function createAppCard(app, variant = "library") {
   const colorClass = colorClassMap[app.color] || colorClassMap.blue;
-  const iconName = iconMap[app.id] || "app-window";
+  const status = getStatus(app);
+  const favorite = isFavorite(app);
 
   return `
-    <article class="app-card ${colorClass}">
-      <a href="${app.url}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}" aria-label="Mở ${app.name} trong tab mới">
+    <article class="app-card ${colorClass} ${variant === "compact" ? "is-compact" : ""}">
+      <a
+        href="${getLaunchHref(app)}"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-app-id="${app.id}"
+        data-launch-mode="${app.launchMode || "external"}"
+        aria-label="Mở ${app.name} trong tab mới"
+      >
         <div class="card-topline">
-          <span class="app-icon">${createIcon(iconName)}</span>
-          <span class="badge">${app.category}</span>
+          <span class="app-icon">${createIcon(app.icon)}</span>
+          <span class="app-status ${status.className}">${status.dot} ${status.label}</span>
         </div>
         <div>
           <h3>${app.name}</h3>
           <p>${app.description}</p>
         </div>
+        <div class="app-meta">
+          <span>${app.category}</span>
+          <span>v${app.version}</span>
+        </div>
         <div class="card-footer">
-          <span>${app.badge}</span>
-          <span>Open ${createIcon("arrow-right")}</span>
+          <span>${app.owner}</span>
+          <span>Open ${createIcon("external-link")}</span>
         </div>
       </a>
+      <button class="favorite-toggle ${favorite ? "is-favorite" : ""}" type="button" data-favorite-id="${app.id}" aria-label="${favorite ? "Bỏ ghim" : "Ghim"} ${app.name}">
+        ${createIcon("star")}
+      </button>
     </article>
   `;
 }
 
 function renderQuickLaunch(apps) {
-  const recentApps = getRecentApps();
-  const quickApps = [...recentApps, ...apps.filter((app) => !recentApps.some((recent) => recent.id === app.id))].slice(0, 4);
+  const quickApps = [...getRecentApps(), ...apps.filter((app) => !getRecentApps().some((recent) => recent.id === app.id))].slice(0, 4);
 
   elements.quickLaunch.innerHTML = quickApps
     .map(
       (app) => `
-        <a href="${app.url}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}" data-tooltip="${app.name}">
-          ${createIcon(iconMap[app.id] || "circle-dot")}
+        <a href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}" data-tooltip="${app.name}">
+          ${createIcon(app.icon)}
           <span>${app.name}</span>
         </a>
       `
@@ -176,9 +258,10 @@ function renderQuickActions(apps) {
     .slice(0, 4)
     .map(
       (app) => `
-        <a class="quick-action ${colorClassMap[app.color] || "is-blue"}" href="${app.url}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
-          <span>${createIcon(iconMap[app.id] || "app-window")}</span>
+        <a class="quick-action ${colorClassMap[app.color] || "is-blue"}" href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
+          <span>${createIcon(app.icon)}</span>
           <strong>${app.name}</strong>
+          <small>v${app.version}</small>
         </a>
       `
     )
@@ -186,14 +269,13 @@ function renderQuickActions(apps) {
 }
 
 function renderTodayApps(apps) {
-  const recentApps = getRecentApps();
-  const todayApps = [...recentApps, ...apps.filter((app) => !recentApps.some((recent) => recent.id === app.id))].slice(0, 4);
+  const todayApps = [...getRecentApps(), ...apps.filter((app) => !getRecentApps().some((recent) => recent.id === app.id))].slice(0, 4);
 
   elements.todayApps.innerHTML = todayApps
     .map(
       (app) => `
-        <a href="${app.url}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
-          ${createIcon(iconMap[app.id] || "app-window")}
+        <a href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
+          ${createIcon(app.icon)}
           <span>${app.name}</span>
         </a>
       `
@@ -212,11 +294,12 @@ function renderRecentActivity() {
   }
 
   elements.recentActivity.innerHTML = recentApps
+    .slice(0, 10)
     .map(
       (app) => `
         <li>
-          <a href="${app.url}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
-            ${createIcon(iconMap[app.id] || "history")}
+          <a href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
+            ${createIcon(app.icon)}
             <span>${app.name}</span>
           </a>
         </li>
@@ -234,22 +317,56 @@ function renderWorkspaceMemory() {
   }
 
   elements.continueWidget.hidden = false;
-  elements.continueLink.href = lastApp.url;
+  elements.continueLink.href = getLaunchHref(lastApp);
+  elements.continueLink.target = "_blank";
+  elements.continueLink.rel = "noopener noreferrer";
   elements.continueLink.dataset.appId = lastApp.id;
   elements.continueName.textContent = lastApp.name;
 }
 
-function renderApps(apps) {
-  state.apps = apps;
-  elements.appGrid.innerHTML = apps.map(createAppCard).join("");
-  elements.appCount.textContent = `${apps.length} ứng dụng`;
-  renderQuickLaunch(apps);
-  renderQuickActions(apps);
-  renderTodayApps(apps);
+function renderFavorites() {
+  const favoriteApps = state.filteredApps.filter(isFavorite);
+  elements.favoriteCount.textContent = `${favoriteApps.length} pinned`;
+
+  elements.favoriteGrid.innerHTML = favoriteApps.length
+    ? favoriteApps.map((app) => createAppCard(app, "compact")).join("")
+    : `<div class="empty-state compact-empty"><strong>Chưa có favorites</strong><span>Nhấn biểu tượng sao trên card để ghim ứng dụng.</span></div>`;
+}
+
+function renderRecentlyUsedGrid() {
+  const recentApps = getRecentApps().filter((app) => state.filteredApps.some((filtered) => filtered.id === app.id));
+  elements.recentCount.textContent = `${recentApps.length} recent`;
+
+  elements.recentGrid.innerHTML = recentApps.length
+    ? recentApps.slice(0, 4).map((app) => createAppCard(app, "compact")).join("")
+    : `<div class="empty-state compact-empty"><strong>Chưa có recently used</strong><span>Các ứng dụng vừa mở sẽ xuất hiện tại đây.</span></div>`;
+}
+
+function renderLibrary() {
+  elements.appGrid.innerHTML = state.filteredApps.length
+    ? state.filteredApps.map((app) => createAppCard(app)).join("")
+    : `<div class="empty-state"><strong>Không tìm thấy ứng dụng</strong><span>Thử tìm bằng tên hoặc danh mục khác.</span></div>`;
+
+  elements.appCount.textContent = `${state.filteredApps.length} ứng dụng`;
+}
+
+function renderLauncher() {
+  state.filteredApps = getFilteredApps();
+  renderQuickLaunch(state.apps);
+  renderQuickActions(state.apps);
+  renderTodayApps(state.apps);
   renderRecentActivity();
   renderWorkspaceMemory();
+  renderFavorites();
+  renderRecentlyUsedGrid();
+  renderLibrary();
   renderSearchResults();
   refreshIcons();
+}
+
+function renderApps(apps) {
+  state.apps = apps;
+  renderLauncher();
 }
 
 function renderEmptyState() {
@@ -313,12 +430,7 @@ function getSearchMatches() {
     return state.apps;
   }
 
-  return state.apps.filter((app) =>
-    [app.name, app.description, app.category, app.badge]
-      .join(" ")
-      .toLowerCase()
-      .includes(query)
-  );
+  return state.apps.filter((app) => getSearchText(app).includes(query));
 }
 
 function renderSearchResults() {
@@ -338,11 +450,11 @@ function renderSearchResults() {
   elements.searchResults.innerHTML = matches
     .map(
       (app, index) => `
-        <button class="search-result ${index === state.searchIndex ? "is-selected" : ""}" type="button" data-app-id="${app.id}" role="option">
-          <span class="result-icon">${createIcon(iconMap[app.id] || "app-window")}</span>
+        <button class="search-result ${index === state.searchIndex ? "is-selected" : ""}" type="button" data-search-app-id="${app.id}" role="option">
+          <span class="result-icon">${createIcon(app.icon)}</span>
           <span>
             <strong>${app.name}</strong>
-            <small>${app.description}</small>
+            <small>${app.category} • v${app.version}</small>
           </span>
           <kbd>Enter</kbd>
         </button>
@@ -370,7 +482,7 @@ function closeSearch() {
 
 function openSelectedSearchResult() {
   const matches = getSearchMatches();
-  openApp(matches[state.searchIndex]);
+  launchApp(matches[state.searchIndex]);
   closeSearch();
 }
 
@@ -405,15 +517,27 @@ function bindEvents() {
   elements.themeToggle.addEventListener("click", toggleTheme);
   elements.sidebarToggle.addEventListener("click", toggleSidebar);
 
+  elements.launcherSearch.addEventListener("input", () => {
+    state.launcherQuery = elements.launcherSearch.value;
+    renderLauncher();
+  });
+
+  elements.clearSearch.addEventListener("click", () => {
+    elements.launcherSearch.value = "";
+    state.launcherQuery = "";
+    renderLauncher();
+    elements.launcherSearch.focus();
+  });
+
   elements.globalSearch.addEventListener("input", () => {
     state.searchIndex = 0;
     renderSearchResults();
   });
 
   elements.searchResults.addEventListener("click", (event) => {
-    const result = event.target.closest("[data-app-id]");
+    const result = event.target.closest("[data-search-app-id]");
     if (result) {
-      openApp(getAppById(result.dataset.appId));
+      launchApp(getAppById(result.dataset.searchAppId));
       closeSearch();
     }
   });
@@ -425,9 +549,19 @@ function bindEvents() {
   });
 
   document.addEventListener("click", (event) => {
+    const favoriteButton = event.target.closest("[data-favorite-id]");
+    if (favoriteButton) {
+      const app = getAppById(favoriteButton.dataset.favoriteId);
+      persistFavorite(app.id, !isFavorite(app));
+      renderLauncher();
+      return;
+    }
+
     const appLink = event.target.closest("a[data-app-id]");
     if (appLink) {
-      recordAppOpen(appLink.dataset.appId);
+      const app = getAppById(appLink.dataset.appId);
+      event.preventDefault();
+      launchApp(app);
     }
   });
 
@@ -471,7 +605,7 @@ function bindEvents() {
 
 async function loadApps() {
   try {
-    const response = await fetch(CONFIG.appsSource);
+    const response = await fetch(CONFIG.appsSource, { cache: "no-store" });
 
     if (!response.ok) {
       throw new Error(`Không tải được ${CONFIG.appsSource}`);
