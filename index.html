@@ -11,65 +11,181 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="workspace-shell">
-      <aside class="sidebar" aria-label="Điều hướng chính">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <div class="workspace-shell" id="workspace-shell">
+      <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+        <button
+          class="sidebar-toggle"
+          id="sidebar-toggle"
+          type="button"
+          aria-label="Thu gọn sidebar"
+          title="Thu gọn sidebar"
+        >
+          <i data-lucide="panel-left-close" aria-hidden="true"></i>
+        </button>
+
         <a class="brand" href="#" aria-label="Radiology Workspace Home">
           <span class="brand-mark">RW</span>
           <span>
             <strong>Radiology Workspace</strong>
-            <small>Version 1.0.0</small>
+            <small>Version 3.0</small>
           </span>
         </a>
 
         <nav class="navigation" id="navigation"></nav>
 
-        <section class="owner-panel" aria-label="Thông tin đơn vị">
-          <span>Owner</span>
-          <strong>BS Thanh Vũ</strong>
-          <small>Viện Điện Quang<br />Bệnh viện Bạch Mai</small>
+        <section class="quick-launch" aria-label="Quick Launch">
+          <div class="panel-label">Quick Launch</div>
+          <div class="quick-launch-list" id="quick-launch"></div>
         </section>
       </aside>
 
-      <div class="content-shell">
+      <div class="desktop">
         <header class="page-header">
           <div>
-            <p class="eyebrow">Xin chào BS Thanh Vũ</p>
+            <p class="eyebrow">Xin chào BS Thanh Vũ <span aria-hidden="true">👋</span></p>
             <h1>Radiology Workspace</h1>
             <p class="subtitle">Điều hành • Chuyên môn • Nghiên cứu</p>
           </div>
 
-          <div class="time-card" aria-label="Thời gian hiện tại">
-            <span id="current-date">--</span>
-            <strong id="current-time">--:--:--</strong>
+          <div class="header-actions">
+            <button class="command-button" id="command-button" type="button" aria-label="Mở Global Search">
+              <i data-lucide="search" aria-hidden="true"></i>
+              <span>Search</span>
+              <kbd>Ctrl K</kbd>
+            </button>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Bật Dark Mode">
+              <i data-lucide="moon" aria-hidden="true"></i>
+            </button>
           </div>
         </header>
 
-        <main>
-          <section class="toolbar" aria-label="Bộ lọc ứng dụng">
-            <div>
-              <span class="section-kicker">Portal</span>
-              <h2>Ứng dụng nội bộ</h2>
-            </div>
-            <div class="status-pill" id="app-count">0 ứng dụng</div>
-          </section>
+        <div class="workspace-grid">
+          <main class="main-workspace">
+            <section class="hero-card" aria-label="Lời chào theo thời gian">
+              <div>
+                <p class="hero-kicker">Workspace Portal</p>
+                <h2 id="hero-greeting">Chào buổi sáng BS Thanh Vũ</h2>
+                <p>Hôm nay bạn muốn làm gì?</p>
+              </div>
+              <div class="hero-orbit" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </section>
 
-          <section class="app-grid" id="app-grid" aria-live="polite"></section>
-        </main>
+            <section class="quick-actions" aria-label="Quick Actions">
+              <div class="quick-action-grid" id="quick-actions"></div>
+            </section>
+
+            <section class="toolbar" aria-label="Danh sách ứng dụng">
+              <div>
+                <span class="section-kicker">Application Library</span>
+                <h2>Ứng dụng nội bộ</h2>
+              </div>
+              <div class="status-pill" id="app-count">0 ứng dụng</div>
+            </section>
+
+            <section class="app-grid" id="app-grid" aria-live="polite"></section>
+          </main>
+
+          <aside class="right-panel" aria-label="Workspace widgets">
+            <section class="side-widget today-widget">
+              <div class="widget-heading">
+                <span>Today</span>
+                <i data-lucide="sun-medium" aria-hidden="true"></i>
+              </div>
+              <div class="today-time" id="current-time">--:--:--</div>
+              <div class="today-date" id="current-date">--</div>
+              <p id="today-greeting">Chào buổi sáng BS Thanh Vũ</p>
+              <div class="weather-row">
+                <i data-lucide="cloud-sun" aria-hidden="true"></i>
+                <span>Weather placeholder</span>
+              </div>
+            </section>
+
+            <section class="side-widget continue-widget" id="continue-widget" hidden>
+              <div class="widget-heading">
+                <span>Workspace Memory</span>
+                <i data-lucide="history" aria-hidden="true"></i>
+              </div>
+              <strong>Continue where you left off</strong>
+              <a class="continue-link" id="continue-link" href="#" target="_blank" rel="noopener noreferrer">
+                <span id="continue-name">Ứng dụng gần nhất</span>
+                <i data-lucide="arrow-right" aria-hidden="true"></i>
+              </a>
+            </section>
+
+            <section class="side-widget focus-widget">
+              <div class="widget-heading">
+                <span>Today's Focus</span>
+                <i data-lucide="sparkles" aria-hidden="true"></i>
+              </div>
+              <strong>Ổn định vận hành trong ngày</strong>
+              <p>Ưu tiên theo dõi phân ca, dashboard và các đầu việc giao ban.</p>
+            </section>
+
+            <section class="side-widget">
+              <div class="widget-heading">
+                <span>Today's Apps</span>
+                <i data-lucide="layout-grid" aria-hidden="true"></i>
+              </div>
+              <div class="mini-stack" id="today-apps"></div>
+            </section>
+
+            <section class="side-widget">
+              <div class="widget-heading">
+                <span>Recent Activity</span>
+                <i data-lucide="activity" aria-hidden="true"></i>
+              </div>
+              <ul class="activity-list" id="recent-activity"></ul>
+            </section>
+
+            <section class="side-widget coming-soon">
+              <div class="widget-heading">
+                <span>Coming Soon</span>
+                <i data-lucide="rocket" aria-hidden="true"></i>
+              </div>
+              <p>Favorites • Search • Dark Mode • Notification</p>
+            </section>
+          </aside>
+        </div>
 
         <footer class="footer">
           <strong>Radiology Workspace</strong>
-          <span>Version 1.0.0</span>
-          <span>© 2026 BS Thanh Vũ</span>
+          <span>Version 3.0</span>
+          <span>Designed for Radiology</span>
         </footer>
       </div>
     </div>
 
+    <div class="command-overlay" id="command-overlay" aria-hidden="true">
+      <div class="command-palette" role="dialog" aria-modal="true" aria-label="Global Search">
+        <div class="search-field">
+          <i data-lucide="search" aria-hidden="true"></i>
+          <input
+            id="global-search"
+            type="search"
+            autocomplete="off"
+            placeholder="Search apps..."
+            aria-label="Search apps"
+          />
+          <kbd>Esc</kbd>
+        </div>
+        <div class="search-results" id="search-results" role="listbox"></div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="script.js" type="module"></script>
   </body>
 </html>
