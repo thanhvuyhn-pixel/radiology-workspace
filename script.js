@@ -62,6 +62,12 @@ const elements = {
   libraryToolbar: document.querySelector(".main-workspace > .toolbar"),
   libraryKicker: document.querySelector(".main-workspace > .toolbar .section-kicker"),
   libraryTitle: document.querySelector(".main-workspace > .toolbar h2"),
+  workspaceContent: document.querySelector("#workspace-content"),
+  workspaceBreadcrumb: document.querySelector("#workspace-breadcrumb"),
+  workspaceTitle: document.querySelector("#workspace-title"),
+  workspaceDescription: document.querySelector("#workspace-description"),
+  workspaceHomeButton: document.querySelector("#workspace-home-button"),
+  workspaceFrame: document.querySelector("#workspace-frame"),
   favoriteGrid: document.querySelector("#favorite-grid"),
   favoriteCount: document.querySelector("#favorite-count"),
   recentGrid: document.querySelector("#recent-grid"),
@@ -139,7 +145,19 @@ function getStatus(app) {
 }
 
 function getLaunchHref(app) {
-  return app.launchMode === "workspace" && app.workspacePath ? app.workspacePath : app.url;
+  return app.url;
+}
+
+function getLaunchTarget(app) {
+  return app.launchMode === "workspace" ? "_self" : "_blank";
+}
+
+function getLaunchRel(app) {
+  return app.launchMode === "workspace" ? "" : "noopener noreferrer";
+}
+
+function getLaunchLabel(app) {
+  return app.launchMode === "workspace" ? `Mở ${app.name} trong Workspace` : `Mở ${app.name} trong tab mới`;
 }
 
 function getSearchText(app) {
@@ -182,7 +200,8 @@ function setMainSectionsVisibility({
   launcherSearch = true,
   favorites = false,
   recentlyUsed = false,
-  library = true
+  library = true,
+  workspace = false
 } = {}) {
   [
     [elements.heroCard, hero],
@@ -191,11 +210,14 @@ function setMainSectionsVisibility({
     [elements.favoritesSection, favorites],
     [elements.recentlyUsedSection, recentlyUsed],
     [elements.libraryToolbar, library],
-    [elements.appGrid, library]
+    [elements.appGrid, library],
+    [elements.workspaceContent, workspace]
   ].forEach(([element, visible]) => {
     element.hidden = !visible;
     element.style.display = visible ? "" : "none";
   });
+
+  elements.workspaceContent.classList.toggle("is-visible", workspace);
 }
 
 function setLibraryHeading(kicker, title) {
@@ -239,6 +261,24 @@ function setLaunchLoading(appId) {
   }, 650);
 }
 
+function openWorkspaceApp(app) {
+  setMainSectionsVisibility({ workspace: true });
+  elements.workspaceBreadcrumb.textContent = app.category;
+  elements.workspaceTitle.textContent = app.name;
+  elements.workspaceDescription.textContent = app.description;
+  elements.workspaceFrame.title = app.name;
+  elements.workspaceFrame.src = app.url;
+  elements.shell.classList.add("is-app-open");
+  elements.workspaceContent.classList.add("is-visible");
+  refreshIcons();
+}
+
+function closeWorkspaceApp() {
+  elements.workspaceFrame.removeAttribute("src");
+  elements.shell.classList.remove("is-app-open");
+  renderLauncher();
+}
+
 function launchApp(app) {
   if (!app) {
     return;
@@ -247,8 +287,8 @@ function launchApp(app) {
   recordAppOpen(app.id);
   setLaunchLoading(app.id);
 
-  if (app.launchMode === "workspace" && app.workspacePath) {
-    window.location.href = app.workspacePath;
+  if (app.launchMode === "workspace") {
+    openWorkspaceApp(app);
     return;
   }
 
@@ -277,11 +317,11 @@ function createAppCard(app, variant = "library") {
     <article class="app-card ${colorClass} ${variant === "compact" ? "is-compact" : ""}">
       <a
         href="${getLaunchHref(app)}"
-        target="_blank"
-        rel="noopener noreferrer"
+        target="${getLaunchTarget(app)}"
+        rel="${getLaunchRel(app)}"
         data-app-id="${app.id}"
         data-launch-mode="${app.launchMode || "external"}"
-        aria-label="Mở ${app.name} trong tab mới"
+        aria-label="${getLaunchLabel(app)}"
       >
         <div class="card-topline">
           <span class="app-icon">${createIcon(app.icon)}</span>
@@ -313,7 +353,7 @@ function renderQuickLaunch(apps) {
   elements.quickLaunch.innerHTML = quickApps
     .map(
       (app) => `
-        <a href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}" data-tooltip="${app.name}">
+        <a href="${getLaunchHref(app)}" target="${getLaunchTarget(app)}" rel="${getLaunchRel(app)}" data-app-id="${app.id}" data-tooltip="${app.name}">
           ${createIcon(app.icon)}
           <span>${app.name}</span>
         </a>
@@ -327,7 +367,7 @@ function renderQuickActions(apps) {
     .slice(0, 4)
     .map(
       (app) => `
-        <a class="quick-action ${colorClassMap[app.color] || "is-blue"}" href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
+        <a class="quick-action ${colorClassMap[app.color] || "is-blue"}" href="${getLaunchHref(app)}" target="${getLaunchTarget(app)}" rel="${getLaunchRel(app)}" data-app-id="${app.id}">
           <span>${createIcon(app.icon)}</span>
           <strong>${app.name}</strong>
           <small>v${app.version}</small>
@@ -343,7 +383,7 @@ function renderTodayApps(apps) {
   elements.todayApps.innerHTML = todayApps
     .map(
       (app) => `
-        <a href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
+        <a href="${getLaunchHref(app)}" target="${getLaunchTarget(app)}" rel="${getLaunchRel(app)}" data-app-id="${app.id}">
           ${createIcon(app.icon)}
           <span>${app.name}</span>
         </a>
@@ -367,7 +407,7 @@ function renderRecentActivity() {
     .map(
       (app) => `
         <li>
-          <a href="${getLaunchHref(app)}" target="_blank" rel="noopener noreferrer" data-app-id="${app.id}">
+          <a href="${getLaunchHref(app)}" target="${getLaunchTarget(app)}" rel="${getLaunchRel(app)}" data-app-id="${app.id}">
             ${createIcon(app.icon)}
             <span>${app.name}</span>
           </a>
@@ -387,8 +427,8 @@ function renderWorkspaceMemory() {
 
   elements.continueWidget.hidden = false;
   elements.continueLink.href = getLaunchHref(lastApp);
-  elements.continueLink.target = "_blank";
-  elements.continueLink.rel = "noopener noreferrer";
+  elements.continueLink.target = getLaunchTarget(lastApp);
+  elements.continueLink.rel = getLaunchRel(lastApp);
   elements.continueLink.dataset.appId = lastApp.id;
   elements.continueName.textContent = lastApp.name;
 }
@@ -775,6 +815,8 @@ function toggleSidebar() {
 
 function switchView(viewId) {
   state.currentView = viewId;
+  elements.workspaceFrame.removeAttribute("src");
+  elements.shell.classList.remove("is-app-open");
   resetLauncherSearch();
   setActiveNavigation(viewId);
   renderLauncher();
@@ -784,6 +826,7 @@ function bindEvents() {
   elements.commandButton.addEventListener("click", openSearch);
   elements.themeToggle.addEventListener("click", toggleTheme);
   elements.sidebarToggle.addEventListener("click", toggleSidebar);
+  elements.workspaceHomeButton.addEventListener("click", closeWorkspaceApp);
 
   elements.launcherSearch.addEventListener("input", () => {
     state.launcherQuery = elements.launcherSearch.value;

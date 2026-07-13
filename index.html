@@ -132,6 +132,23 @@
             </section>
 
             <section class="app-grid" id="app-grid" aria-live="polite"></section>
+
+            <section class="workspace-content" id="workspace-content" aria-label="Workspace Content" hidden>
+              <div class="workspace-content-header">
+                <div>
+                  <div class="workspace-breadcrumb" id="workspace-breadcrumb">Research</div>
+                  <h2 id="workspace-title">Workspace</h2>
+                  <p id="workspace-description">Application workspace</p>
+                </div>
+                <button class="workspace-home-button" id="workspace-home-button" type="button">
+                  <i data-lucide="arrow-left" aria-hidden="true"></i>
+                  Home
+                </button>
+              </div>
+              <div class="workspace-frame-shell">
+                <iframe id="workspace-frame" title="Workspace application"></iframe>
+              </div>
+            </section>
           </main>
 
           <aside class="right-panel" aria-label="Workspace widgets">
@@ -222,6 +239,6 @@
     </div>
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="script.js?v=3.2.1" type="module"></script>
+    <script src="script.js?v=3.3.0" type="module"></script>
   </body>
 </html>

@@ -257,6 +257,22 @@
       "badge": "Quality & Safety",
       "launchMode": "external",
       "workspacePath": "apps/bao-cao-su-co-y-khoa/index.html"
+    },
+    {
+      "id": "lung-registry",
+      "title": "Quản lý nốt phổi",
+      "name": "Quản lý nốt phổi",
+      "icon": "lung",
+      "category": "Research",
+      "description": "Thoracic Imaging Research Platform",
+      "url": "http://127.0.0.1:8082/",
+      "version": "1.0.0",
+      "status": "beta",
+      "owner": "BS Thanh Vũ",
+      "favorite": false,
+      "color": "blue",
+      "badge": "Research",
+      "launchMode": "workspace"
     }
   ]
 }
