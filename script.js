@@ -37,6 +37,7 @@ const state = {
   filteredApps: [],
   searchOpen: false,
   searchIndex: 0,
+  currentView: "home",
   launcherQuery: ""
 };
 
@@ -53,6 +54,14 @@ const elements = {
   continueName: document.querySelector("#continue-name"),
   launcherSearch: document.querySelector("#launcher-search"),
   clearSearch: document.querySelector("#clear-search"),
+  heroCard: document.querySelector(".hero-card"),
+  quickActionsSection: document.querySelector(".quick-actions"),
+  launcherSearchPanel: document.querySelector(".launcher-search-panel"),
+  favoritesSection: document.querySelector(".favorites-section"),
+  recentlyUsedSection: document.querySelector(".recently-used-section"),
+  libraryToolbar: document.querySelector(".main-workspace > .toolbar"),
+  libraryKicker: document.querySelector(".main-workspace > .toolbar .section-kicker"),
+  libraryTitle: document.querySelector(".main-workspace > .toolbar h2"),
   favoriteGrid: document.querySelector("#favorite-grid"),
   favoriteCount: document.querySelector("#favorite-count"),
   recentGrid: document.querySelector("#recent-grid"),
@@ -147,6 +156,66 @@ function getFilteredApps() {
   }
 
   return state.apps.filter((app) => getSearchText(app).includes(query));
+}
+
+function filterApps(apps) {
+  const query = state.launcherQuery.trim().toLowerCase();
+
+  if (!query) {
+    return apps;
+  }
+
+  return apps.filter((app) => getSearchText(app).includes(query));
+}
+
+function getAppsByIds(appIds) {
+  return appIds.map(getAppById).filter(Boolean);
+}
+
+function getAppsByCategory(category) {
+  return state.apps.filter((app) => app.category === category);
+}
+
+function setMainSectionsVisibility({
+  hero = false,
+  quickActions = false,
+  launcherSearch = true,
+  favorites = false,
+  recentlyUsed = false,
+  library = true
+} = {}) {
+  [
+    [elements.heroCard, hero],
+    [elements.quickActionsSection, quickActions],
+    [elements.launcherSearchPanel, launcherSearch],
+    [elements.favoritesSection, favorites],
+    [elements.recentlyUsedSection, recentlyUsed],
+    [elements.libraryToolbar, library],
+    [elements.appGrid, library]
+  ].forEach(([element, visible]) => {
+    element.hidden = !visible;
+    element.style.display = visible ? "" : "none";
+  });
+}
+
+function setLibraryHeading(kicker, title) {
+  elements.libraryKicker.textContent = kicker;
+  elements.libraryTitle.textContent = title;
+}
+
+function setActiveNavigation(activeId) {
+  menuItems.forEach((item) => {
+    item.active = item.id === activeId;
+  });
+
+  document.querySelectorAll("[data-nav-id]").forEach((item) => {
+    item.classList.toggle("is-active", item.dataset.navId === activeId);
+  });
+}
+
+function resetLauncherSearch() {
+  state.launcherQuery = "";
+  elements.launcherSearch.value = "";
 }
 
 function recordAppOpen(appId) {
@@ -342,15 +411,108 @@ function renderRecentlyUsedGrid() {
     : `<div class="empty-state compact-empty"><strong>Chưa có recently used</strong><span>Các ứng dụng vừa mở sẽ xuất hiện tại đây.</span></div>`;
 }
 
-function renderLibrary() {
-  elements.appGrid.innerHTML = state.filteredApps.length
-    ? state.filteredApps.map((app) => createAppCard(app)).join("")
+function renderLibrary(apps = state.filteredApps) {
+  elements.appGrid.innerHTML = apps.length
+    ? apps.map((app) => createAppCard(app)).join("")
     : `<div class="empty-state"><strong>Không tìm thấy ứng dụng</strong><span>Thử tìm bằng tên hoặc danh mục khác.</span></div>`;
 
-  elements.appCount.textContent = `${state.filteredApps.length} ứng dụng`;
+  elements.appCount.textContent = `${apps.length} ứng dụng`;
 }
 
-function renderLauncher() {
+function renderAppGroups(groups) {
+  const visibleGroups = groups
+    .map((group) => ({ ...group, apps: filterApps(group.apps) }))
+    .filter((group) => group.apps.length > 0);
+  const appTotal = visibleGroups.reduce((total, group) => total + group.apps.length, 0);
+
+  elements.appGrid.innerHTML = visibleGroups.length
+    ? visibleGroups
+        .map(
+          (group) => `
+            <section class="favorites-section">
+              <div class="toolbar compact-toolbar">
+                <div>
+                  <span class="section-kicker">${group.kicker}</span>
+                  <h2>${group.title}</h2>
+                </div>
+                <div class="status-pill">${group.apps.length} ứng dụng</div>
+              </div>
+              <div class="app-grid">
+                ${group.apps.map((app) => createAppCard(app)).join("")}
+              </div>
+            </section>
+          `
+        )
+        .join("")
+    : `<div class="empty-state"><strong>Không tìm thấy ứng dụng</strong><span>Thử tìm bằng tên hoặc danh mục khác.</span></div>`;
+
+  elements.appCount.textContent = `${appTotal} ứng dụng`;
+}
+
+function renderResearchPlaceholder() {
+  elements.appGrid.innerHTML = `
+    <article class="app-card is-blue">
+      <a href="#research" aria-label="Research Workspace">
+        <div class="card-topline">
+          <span class="app-icon">${createIcon("microscope")}</span>
+          <span class="app-status status-beta">🟡 Planned</span>
+        </div>
+        <div>
+          <h3>Research Workspace</h3>
+          <p>Future modules will appear here.</p>
+        </div>
+        <div class="app-meta">
+          <span>Research</span>
+          <span>Reserved</span>
+        </div>
+        <div class="card-footer">
+          <span>Radiology Workspace</span>
+          <span>Coming Soon ${createIcon("sparkles")}</span>
+        </div>
+      </a>
+    </article>
+  `;
+  elements.appCount.textContent = "0 ứng dụng";
+}
+
+function renderSettingsPage() {
+  const themeLabel = document.documentElement.dataset.theme === "dark" ? "Dark Mode" : "Light Mode";
+
+  elements.appGrid.innerHTML = `
+    <article class="app-card is-blue">
+      <a href="#settings" aria-label="Settings">
+        <div class="card-topline">
+          <span class="app-icon">${createIcon("settings")}</span>
+          <span class="app-status status-online">🟢 Active</span>
+        </div>
+        <div>
+          <h3>Settings</h3>
+          <p>Reserve this workspace for future development.</p>
+        </div>
+        <div class="app-meta">
+          <span>Version</span>
+          <span>3.2</span>
+        </div>
+        <div class="card-footer">
+          <span>Theme: ${themeLabel}</span>
+          <span>About Radiology Workspace</span>
+        </div>
+      </a>
+    </article>
+  `;
+  elements.appCount.textContent = "Settings";
+}
+
+function renderHome() {
+  setMainSectionsVisibility({
+    hero: true,
+    quickActions: true,
+    launcherSearch: true,
+    favorites: true,
+    recentlyUsed: true,
+    library: true
+  });
+  setLibraryHeading("Application Library", "Ứng dụng nội bộ");
   state.filteredApps = getFilteredApps();
   renderQuickLaunch(state.apps);
   renderQuickActions(state.apps);
@@ -362,6 +524,105 @@ function renderLauncher() {
   renderLibrary();
   renderSearchResults();
   refreshIcons();
+}
+
+function renderClinical() {
+  setMainSectionsVisibility({ launcherSearch: true, library: true });
+  setLibraryHeading("Workspace", "Clinical");
+  state.filteredApps = filterApps(getAppsByCategory("Clinical"));
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+  renderLibrary(state.filteredApps);
+  renderSearchResults();
+  refreshIcons();
+}
+
+function renderAdministration() {
+  setMainSectionsVisibility({ launcherSearch: true, library: true });
+  setLibraryHeading("Workspace", "Administration");
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+  renderAppGroups([
+    {
+      kicker: "Radiology Workspace",
+      title: "Radiology Workspace",
+      apps: getAppsByIds(["dashboard", "cham-cong", "giao-ban", "phan-ca"])
+    },
+    {
+      kicker: "Hospital Systems",
+      title: "Hospital Systems",
+      apps: getAppsByIds(["ontime-app", "cham-cong-don-vi", "bach-mai-office", "fast"])
+    },
+    {
+      kicker: "Quality & Safety",
+      title: "Quality & Safety",
+      apps: getAppsByIds(["bao-cao-adr", "bao-cao-su-co-y-khoa"])
+    }
+  ]);
+  renderSearchResults();
+  refreshIcons();
+}
+
+function renderResearch() {
+  const researchApps = filterApps(getAppsByCategory("Research"));
+  setMainSectionsVisibility({ launcherSearch: true, library: true });
+  setLibraryHeading("Workspace", "Research");
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+
+  if (researchApps.length > 0) {
+    renderLibrary(researchApps);
+  } else {
+    renderResearchPlaceholder();
+  }
+
+  renderSearchResults();
+  refreshIcons();
+}
+
+function renderFavoritesPage() {
+  setMainSectionsVisibility({ launcherSearch: true, library: true });
+  setLibraryHeading("Workspace", "Favorites");
+  state.filteredApps = filterApps(state.apps).filter(isFavorite);
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+  renderLibrary(state.filteredApps);
+  renderSearchResults();
+  refreshIcons();
+}
+
+function renderSettings() {
+  setMainSectionsVisibility({ launcherSearch: false, library: true });
+  setLibraryHeading("Workspace", "Settings");
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+  renderSettingsPage();
+  renderSearchResults();
+  refreshIcons();
+}
+
+function renderLauncher() {
+  const renderers = {
+    home: renderHome,
+    operations: renderAdministration,
+    clinical: renderClinical,
+    research: renderResearch,
+    favorites: renderFavoritesPage,
+    settings: renderSettings
+  };
+
+  const renderView = renderers[state.currentView] || renderHome;
+  renderView();
 }
 
 function renderApps(apps) {
@@ -512,6 +773,13 @@ function toggleSidebar() {
   applySidebarState(!elements.shell.classList.contains("is-sidebar-collapsed"));
 }
 
+function switchView(viewId) {
+  state.currentView = viewId;
+  resetLauncherSearch();
+  setActiveNavigation(viewId);
+  renderLauncher();
+}
+
 function bindEvents() {
   elements.commandButton.addEventListener("click", openSearch);
   elements.themeToggle.addEventListener("click", toggleTheme);
@@ -549,6 +817,13 @@ function bindEvents() {
   });
 
   document.addEventListener("click", (event) => {
+    const navItem = event.target.closest("[data-nav-id]");
+    if (navItem) {
+      event.preventDefault();
+      switchView(navItem.dataset.navId);
+      return;
+    }
+
     const favoriteButton = event.target.closest("[data-favorite-id]");
     if (favoriteButton) {
       const app = getAppById(favoriteButton.dataset.favoriteId);
