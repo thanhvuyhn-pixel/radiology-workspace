@@ -104,7 +104,7 @@
       "icon": "monitor",
       "category": "Clinical",
       "description": "Remote PACS",
-      "url": "https://pmbv.bachmai.gov.vn:88/ris/study/reading#listStudy",
+      "url": "https://pacs.bachmai.edu.vn/ris/study/reading",
       "version": "1.0.0",
       "status": "online",
       "owner": "BS Thanh Vũ",
