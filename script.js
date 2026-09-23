@@ -15,6 +15,12 @@ const menuItems = [
   { id: "operations", label: "Administration", icon: "users" },
   { id: "clinical", label: "Clinical", icon: "scan-heart" },
   { id: "research", label: "Research", icon: "microscope" },
+  {
+    id: "education-manager",
+    label: "Education Manager",
+    icon: "graduation-cap",
+    url: "https://radiology-education-manager.netlify.app/#dashboard"
+  },
   { id: "favorites", label: "Favorites", icon: "star" },
   { id: "settings", label: "Settings", icon: "settings" }
 ];
@@ -299,7 +305,12 @@ function renderNavigation() {
   elements.navigation.innerHTML = menuItems
     .map(
       (item) => `
-        <a class="nav-item ${item.active ? "is-active" : ""}" href="#${item.id}" data-nav-id="${item.id}" data-tooltip="${item.label}">
+        <a
+          class="nav-item ${item.active ? "is-active" : ""}"
+          href="${item.url || `#${item.id}`}"
+          ${item.url ? 'target="_blank" rel="noopener noreferrer"' : `data-nav-id="${item.id}"`}
+          data-tooltip="${item.label}"
+        >
           <span>${createIcon(item.icon)}</span>
           <span class="nav-label">${item.label}</span>
         </a>
