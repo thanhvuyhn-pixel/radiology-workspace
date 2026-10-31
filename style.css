@@ -157,6 +157,21 @@ svg {
     box-shadow 250ms ease;
 }
 
+.workspace-shell:not(.is-sidebar-collapsed) .navigation {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.navigation-section-label {
+  margin: 12px 13px 0;
+  color: var(--secondary);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 :root[data-theme="dark"] .sidebar {
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.62)),
@@ -268,16 +283,24 @@ svg {
     color 250ms ease;
 }
 
-.nav-item span,
+.nav-item > span:first-child,
 .quick-launch a svg {
   color: var(--primary);
 }
 
-.nav-item span {
+.nav-item > span:first-child {
   display: grid;
+  flex: 0 0 26px;
   width: 26px;
   height: 26px;
   place-items: center;
+}
+
+.nav-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .nav-item svg {
@@ -363,6 +386,7 @@ svg {
 
 .workspace-shell.is-sidebar-collapsed .brand span:last-child,
 .workspace-shell.is-sidebar-collapsed .nav-label,
+.workspace-shell.is-sidebar-collapsed .navigation-section-label,
 .workspace-shell.is-sidebar-collapsed .quick-launch {
   display: none;
 }
@@ -1660,7 +1684,8 @@ h1 {
   }
 
   .brand span:last-child,
-  .nav-label {
+  .nav-label,
+  .navigation-section-label {
     font-size: 0;
   }
 
@@ -1699,13 +1724,18 @@ h1 {
   }
 
   .brand span:last-child,
-  .nav-label {
+  .nav-label,
+  .navigation-section-label {
     font-size: initial;
   }
 
   .navigation {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     margin-top: 18px;
+  }
+
+  .navigation-section-label {
+    grid-column: 1 / -1;
   }
 
   .nav-item {
@@ -1787,7 +1817,8 @@ h1 {
   }
 
   .workspace-shell.is-sidebar-collapsed .brand span:last-child,
-  .workspace-shell.is-sidebar-collapsed .nav-label {
+  .workspace-shell.is-sidebar-collapsed .nav-label,
+  .workspace-shell.is-sidebar-collapsed .navigation-section-label {
     display: block;
   }
 

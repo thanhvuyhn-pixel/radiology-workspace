@@ -21,8 +21,39 @@ const menuItems = [
     icon: "graduation-cap",
     url: "https://radiology-education-manager.netlify.app/#dashboard"
   },
+  {
+    id: "human-resources",
+    label: "Quản lý nhân sự",
+    icon: "contact-round",
+    url: "https://quan-ly-nhan-su-vien-dien-quang.netlify.app/"
+  },
+  {
+    id: "doctor-schedule-site-2",
+    label: "Lịch BS cơ sở 2",
+    icon: "calendar-days",
+    url: "https://docs.google.com/spreadsheets/d/13PWvZSDWcnCGyIfSG8aa5MAd5rdU6OLFZA2p2deX5b0/edit?gid=1275328405#gid=1275328405"
+  },
+  {
+    id: "doctor-schedule-site-1",
+    label: "Lịch BS CS1 - Update",
+    icon: "calendar-sync",
+    url: "https://docs.google.com/spreadsheets/d/1VMV7hd0f8N7WavpJSvb6iJ7cpkNLC8lsKCYdt-pVWdo/edit?gid=1773833575#gid=1773833575"
+  },
+  {
+    id: "doctor-schedule-site-1-trainees",
+    label: "Lịch BS CS1 - Update + HV",
+    icon: "calendar-check-2",
+    url: "https://docs.google.com/spreadsheets/d/1x9WdVQqlaeztysw_0RGNgm3stk-D81S5d6u5aCyYy4M/edit?gid=1377022525#gid=1377022525"
+  },
   { id: "favorites", label: "Favorites", icon: "star" },
-  { id: "settings", label: "Settings", icon: "settings" }
+  { id: "settings", label: "Settings", icon: "settings" },
+  {
+    id: "nhip-weight-loss",
+    label: "Nhịp - giảm cân",
+    icon: "heart-pulse",
+    url: "https://nhip-giam-can.netlify.app/",
+    section: "Cá Nhân"
+  }
 ];
 
 const colorClassMap = {
@@ -304,12 +335,13 @@ function launchApp(app) {
 function renderNavigation() {
   elements.navigation.innerHTML = menuItems
     .map(
-      (item) => `
+      (item) => `${item.section ? `<span class="navigation-section-label">${item.section}</span>` : ""}
         <a
           class="nav-item ${item.active ? "is-active" : ""}"
           href="${item.url || `#${item.id}`}"
           ${item.url ? 'target="_blank" rel="noopener noreferrer"' : `data-nav-id="${item.id}"`}
           data-tooltip="${item.label}"
+          title="${item.label}"
         >
           <span>${createIcon(item.icon)}</span>
           <span class="nav-label">${item.label}</span>
