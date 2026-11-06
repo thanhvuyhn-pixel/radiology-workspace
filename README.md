@@ -15,6 +15,11 @@ Radiology Workspace là màn hình Home khi mở máy, dùng để truy cập nh
 
 Không dùng React, Vue, Angular, Bootstrap hoặc Tailwind.
 
+## Design system
+
+Tài liệu mô tả giao diện và prompt mẫu để đồng bộ các phần mềm khác:
+[Radiology Workspace Design Prompt](docs/RADIOLOGY_WORKSPACE_DESIGN_PROMPT.md).
+
 ## Cấu trúc
 
 ```text

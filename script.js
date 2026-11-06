@@ -27,24 +27,7 @@ const menuItems = [
     icon: "contact-round",
     url: "https://quan-ly-nhan-su-vien-dien-quang.netlify.app/"
   },
-  {
-    id: "doctor-schedule-site-2",
-    label: "Lịch BS cơ sở 2",
-    icon: "calendar-days",
-    url: "https://docs.google.com/spreadsheets/d/13PWvZSDWcnCGyIfSG8aa5MAd5rdU6OLFZA2p2deX5b0/edit?gid=1275328405#gid=1275328405"
-  },
-  {
-    id: "doctor-schedule-site-1",
-    label: "Lịch BS CS1 - Update",
-    icon: "calendar-sync",
-    url: "https://docs.google.com/spreadsheets/d/1VMV7hd0f8N7WavpJSvb6iJ7cpkNLC8lsKCYdt-pVWdo/edit?gid=1773833575#gid=1773833575"
-  },
-  {
-    id: "doctor-schedule-site-1-trainees",
-    label: "Lịch BS CS1 - Update + HV",
-    icon: "calendar-check-2",
-    url: "https://docs.google.com/spreadsheets/d/1x9WdVQqlaeztysw_0RGNgm3stk-D81S5d6u5aCyYy4M/edit?gid=1377022525#gid=1377022525"
-  },
+  { id: "online-schedules", label: "Lịch Online", icon: "calendar-range" },
   { id: "favorites", label: "Favorites", icon: "star" },
   { id: "settings", label: "Settings", icon: "settings" },
   {
@@ -622,6 +605,19 @@ function renderClinical() {
   refreshIcons();
 }
 
+function renderOnlineSchedules() {
+  setMainSectionsVisibility({ launcherSearch: true, library: true });
+  setLibraryHeading("Workspace", "Lịch Online");
+  state.filteredApps = filterApps(getAppsByCategory("Lịch Online"));
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+  renderLibrary(state.filteredApps);
+  renderSearchResults();
+  refreshIcons();
+}
+
 function renderAdministration() {
   setMainSectionsVisibility({ launcherSearch: true, library: true });
   setLibraryHeading("Workspace", "Administration");
@@ -700,6 +696,7 @@ function renderLauncher() {
     operations: renderAdministration,
     clinical: renderClinical,
     research: renderResearch,
+    "online-schedules": renderOnlineSchedules,
     favorites: renderFavoritesPage,
     settings: renderSettings
   };
