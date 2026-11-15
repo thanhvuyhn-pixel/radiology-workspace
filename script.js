@@ -15,18 +15,7 @@ const menuItems = [
   { id: "operations", label: "Administration", icon: "users" },
   { id: "clinical", label: "Clinical", icon: "scan-heart" },
   { id: "research", label: "Research", icon: "microscope" },
-  {
-    id: "education-manager",
-    label: "Education Manager",
-    icon: "graduation-cap",
-    url: "https://radiology-education-manager.netlify.app/#dashboard"
-  },
-  {
-    id: "human-resources",
-    label: "Quản lý nhân sự",
-    icon: "contact-round",
-    url: "https://quan-ly-nhan-su-vien-dien-quang.netlify.app/"
-  },
+  { id: "system-manager", label: "System Manager", icon: "panels-top-left" },
   { id: "online-schedules", label: "Lịch Online", icon: "calendar-range" },
   { id: "favorites", label: "Favorites", icon: "star" },
   { id: "settings", label: "Settings", icon: "settings" },
@@ -618,6 +607,19 @@ function renderOnlineSchedules() {
   refreshIcons();
 }
 
+function renderSystemManager() {
+  setMainSectionsVisibility({ launcherSearch: true, library: true });
+  setLibraryHeading("Workspace", "System Manager");
+  state.filteredApps = filterApps(getAppsByCategory("System Manager"));
+  renderQuickLaunch(state.apps);
+  renderTodayApps(state.apps);
+  renderRecentActivity();
+  renderWorkspaceMemory();
+  renderLibrary(state.filteredApps);
+  renderSearchResults();
+  refreshIcons();
+}
+
 function renderAdministration() {
   setMainSectionsVisibility({ launcherSearch: true, library: true });
   setLibraryHeading("Workspace", "Administration");
@@ -696,6 +698,7 @@ function renderLauncher() {
     operations: renderAdministration,
     clinical: renderClinical,
     research: renderResearch,
+    "system-manager": renderSystemManager,
     "online-schedules": renderOnlineSchedules,
     favorites: renderFavoritesPage,
     settings: renderSettings
